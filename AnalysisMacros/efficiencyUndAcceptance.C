@@ -93,10 +93,10 @@ void efficiencyUndAcceptance()
   myTree->SetBranchAddress("Reco_QQ_sign", &Reco_QQ_sign, &b_Reco_QQ_sign);
 
   TH1D *histogramGeneratedMass = new TH1D("Gen0", "MC - Generated - Invariant Mass", 100, 0, 100);
-  TH1D *histogramReconstructedMass = new TH1D("Gen1", "MC - Generated - Invariant Mass", 100, 0, 100);
-  TH1D *histogramReconstructedMassCuts1 = new TH1D("Gen2", "MC - Generated - Invariant Mass - Pt < 4",100,0,100);
-  TH1D *histogramReconstructedMassCuts2 = new TH1D("Gen3", "MC - Generated - Invariant Mass - Pt < 4 && |Eta| < 2.4",100,0,100);
-  TH1D *histogramReconstructedMassCuts3 = new TH1D("Gen4", "MC - Generated - Invariant Mass - Pt < 4 && |Eta| < 2.4 && Etc",100,0,100);
+  TH1D *histogramReconstructedMass = new TH1D("Gen1", "MC - Reconstructed - Invariant Mass", 100, 0, 100);
+  TH1D *histogramReconstructedMassCuts1 = new TH1D("Gen2", "MC - Reconstructed - Invariant Mass - Pt < 4",100,0,100);
+  TH1D *histogramReconstructedMassCuts2 = new TH1D("Gen3", "MC - Reconstructed - Invariant Mass - Pt < 4 && |Eta| < 2.4",100,0,100);
+  TH1D *histogramReconstructedMassCuts3 = new TH1D("Gen4", "MC - Reconstructed - Invariant Mass - Pt < 4 && |Eta| < 2.4 && Etc",100,0,100);
   TH1D *histograms[5];
 
   // The zeroeth histogram is always going to be the generated events, no cuts.
@@ -169,15 +169,17 @@ for(Int_t i = 0; i < Reco_QQ_size; i++)
 	histograms[0]->SetFillColor(kYellow);
 	Double_t entriesOfGen = histograms[0]->GetEntries();  
 	std::cout << "Number of entries " << entriesOfGen; 
-	histograms[0]->Scale(1/entriesOfGen);
-	histograms[0]->Draw();
-	for(Int_t i = 1; i < 4; i++)
+
+	TLegend *legend = new TLegend(0.1,0.7,0.48,0.9);
+  for(Int_t i = 0; i < 4; i++)
   {
-	histograms[i]->SetFillColor(i * 5 + 8);  
-	histograms[i]->Scale(1/entriesOfGen);  
-        histograms[i]->Draw("SAME");
-
- }
-
+    TString options = "SAME";
+    if(i == 0) options == "";
+	  histograms[i]->SetFillColor(i * 5 + 8);  
+	  histograms[i]->Scale(1/entriesOfGen);  
+    histograms[i]->Draw(options);
+    legend->AddEntry(histograms[i], histograms[i]->GetTitle(), "f");
+  }
+  legend->Draw("SAME");
 
 }
