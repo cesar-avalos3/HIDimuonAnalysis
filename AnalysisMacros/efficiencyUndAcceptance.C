@@ -3,21 +3,14 @@
 
 
 // TODO Change the CUTS integer into a TCuts, so the function is really just a generic cutting function
-bool Cut(TLorentzVector* mumi, TLorentzVector* mupl, TLorentzVector* dimu,Int_t Reco_QQ_sign ,int CUTS)
+bool Cut(TLorentzVector* mumi, TLorentzVector* mupl, TLorentzVector* dimu,Int_t Reco_QQ_sign ,Int_t CUTS)
 {
 
-  TCut cut0 = TCut("1 > 0");
-  TCut cut1 = TCut("mumi.Pt() > 4 && mupl.Pt() > 4");
-  TCut cut2 = TCut("mumi.Pt() > 4 && mupl.Pt() > 4 && TMath::Abs(mumi.PseudoRapidity()) < 2.4 && TMath::Abs(mupl.PseudoRapidity()) < 2.4 ");
-  TCut cut3 = TCut("mumi.Pt() > 4 && mupl.Pt() > 4 && TMath::Abs(mumi.PseudoRapidity()) < 2.4 && TMath::Abs(mupl.PseudoRapidity()) < 2.4 && Reco_QQ_sign == 0 ");
-  TCut cut4 = TCut("mumi.Pt() > 4 && mupl.Pt() > 4 && TMath::Abs(mumi.PseudoRapidity()) < 2.4 && TMath::Abs(mupl.PseudoRapidity()) < 2.4 && Reco_QQ_sign == 0 && dimu.M() > 10");
-  TCut cut5 = TCut("mumi.Pt() > 4 && mupl.Pt() > 4 && TMath::Abs(mumi.PseudoRapidity()) < 2.4 && TMath::Abs(mupl.PseudoRapidity()) < 2.4 && Reco_QQ_sign == 0 && dimu.M() > 10 && (1 - (TMath::Abs(mumi.Phi() - mupl.Phi()) / pi) ) < 0.008");
-
-  switch(CUTS)
+ switch(CUTS)
 	{
 		case(0):
 		case(1):
-			if(1 > 0)
+			if(1)
 			return true;
 		break;
 		case(2):
@@ -32,7 +25,17 @@ bool Cut(TLorentzVector* mumi, TLorentzVector* mupl, TLorentzVector* dimu,Int_t 
 			if(mumi->Pt() > 4 && mupl->Pt() > 4 && TMath::Abs(mumi->PseudoRapidity()) && TMath::Abs(mupl->PseudoRapidity()) < 2.4 && Reco_QQ_sign == 0)
 			return true;
 			break;
+		case(5):
+			if(mumi->Pt() > 4 && mupl->Pt() > 4 && TMath::Abs(mumi->PseudoRapidity()) && TMath::Abs(mupl->PseudoRapidity()) < 2.4 && Reco_QQ_sign == 0 && dimu->M() > 10)
+			return true;
+			break;
+		case(6):
+			if(mumi->Pt() > 4 && mupl->Pt() > 4 && TMath::Abs(mumi->PseudoRapidity()) && TMath::Abs(mupl->PseudoRapidity()) < 2.4 && Reco_QQ_sign == 0 && dimu->M() > 10
+			&& (1 - (TMath::Abs(mumi->Phi() - mupl->Phi()) / TMath::Pi()) ) < 0.008)
+			return true;
+			break;
 	}
+
         return false;
 }
 
@@ -40,9 +43,9 @@ bool Cut(TLorentzVector* mumi, TLorentzVector* mupl, TLorentzVector* dimu,Int_t 
 // TODO Implement more variables, like rapidity and acoplanarity
 void efficiencyUndAcceptance()
 {
-  inFile = new TFile("OniaTree_MC_ppRec.root");
+  TFile* inFile = new TFile("OniaTree_MC_ppRec.root");
 
-  myTree = (TTree*) inFile->Get("hionia/myTree");
+  TTree* myTree = (TTree*) inFile->Get("hionia/myTree");
 
   //Set up all pertinent variables for the loop-de-looping
   Int_t           Gen_QQ_size;
@@ -107,13 +110,14 @@ void efficiencyUndAcceptance()
 
   //CUTS!
 
-  TString fullGenericCut = TString("mumi.Pt() > 4 && mupl.Pt() > 4 && TMath::Abs(mumi.PseudoRapidity()) && TMath::Abs(mupl.PseudoRapidity()) < 2.4 && Reco_QQ_sign == 0 && dimu.M() > 10 && (1 - (TMath::Abs(mumi.Phi() - mupl.Phi()) / pi) ) < 0.008");
-  TString cut0 = TString("1 > 0");
-  TString cut1 = TString("mumi.Pt() > 4 && mupl.Pt() > 4");
-  TString cut2 = TString("mumi.Pt() > 4 && mupl.Pt() > 4 && TMath::Abs(mumi.PseudoRapidity()) && TMath::Abs(mupl.PseudoRapidity()) < 2.4 ");
-  TString cut3 = TString("mumi.Pt() > 4 && mupl.Pt() > 4 && TMath::Abs(mumi.PseudoRapidity()) && TMath::Abs(mupl.PseudoRapidity()) < 2.4 && Reco_QQ_sign == 0 ");
-  
-  TString* cuts[5];
+  TCut cut0 = TCut("1 > 0");
+  TCut cut1 = TCut("mumi.Pt() > 4 && mupl.Pt() > 4");
+  TCut cut2 = TCut("mumi.Pt() > 4 && mupl.Pt() > 4 && TMath::Abs(mumi.PseudoRapidity()) < 2.4 && TMath::Abs(mupl.PseudoRapidity()) < 2.4 ");
+  TCut cut3 = TCut("mumi.Pt() > 4 && mupl.Pt() > 4 && TMath::Abs(mumi.PseudoRapidity()) < 2.4 && TMath::Abs(mupl.PseudoRapidity()) < 2.4 && Reco_QQ_sign == 0 ");
+  TCut cut4 = TCut("mumi.Pt() > 4 && mupl.Pt() > 4 && TMath::Abs(mumi.PseudoRapidity()) < 2.4 && TMath::Abs(mupl.PseudoRapidity()) < 2.4 && Reco_QQ_sign == 0 && dimu.M() > 10");
+  TCut cut5 = TCut("mumi.Pt() > 4 && mupl.Pt() > 4 && TMath::Abs(mumi.PseudoRapidity()) < 2.4 && TMath::Abs(mupl.PseudoRapidity()) < 2.4 && Reco_QQ_sign == 0 && dimu.M() > 10 && (1 - (TMath::Abs(mumi.Phi() - mupl.Phi()) / pi) ) < 0.008");
+
+  TCut* cuts[5];
   cuts[0] = &cut0;
   cuts[1] = &cut0;
   cuts[2] = &cut1;
