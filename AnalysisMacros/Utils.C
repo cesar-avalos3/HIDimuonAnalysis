@@ -4,6 +4,7 @@
   TString recTag = TString("Rec");
 
   TString invTag = TString("-invM");
+  TString acoTag = TString("aco");
 
   TString cut0 = TString("Generated - No cut");
   TString cut1 = TString("Reconstructed - No cut");
