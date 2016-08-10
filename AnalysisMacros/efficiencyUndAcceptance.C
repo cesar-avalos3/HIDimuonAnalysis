@@ -160,7 +160,7 @@ void efficiencyUndAcceptance()
   TH1D *histogramsInvariantMass[7];
 
   Int_t binsMass = 200;
-  TString titleInvariantMass = TString("MC - InvariantMass - ");
+  TString titleInvariantMass = TString("MC - #mu^{+}#mu^{-} - InvariantMass - ");
   Int_t numberOfInvariantMassHistograms = 7;
 
   // CONVENTION - The zeroeth histogram is always going to be the generated events, no cuts.
@@ -179,7 +179,7 @@ void efficiencyUndAcceptance()
   Int_t binsRapidity = 100;
   Double_t minRapidity = -2.5;
   Double_t maxRapidity =  2.5;
-  TString titleRapidity = TString("MC - Rapidity - ");
+  TString titleRapidity = TString("MC - #mu^{+}#mu^{-} - Rapidity - ");
   Int_t numberOfRapidityHistograms = 7;
 
   for(Int_t i = 0; i < numberOfRapidityHistograms; i++)
@@ -187,7 +187,8 @@ void efficiencyUndAcceptance()
     TString tag = recTag;
     if(i == 0) tag = genTag;
     tag += i;
-    histogramsRapidity[i] = new TH1D(tag, titleRapidity + cuts[i] , binsRapidity, minRapidity, maxRapidity);
+    tag += rapTag;
+    histogramsRapidity[i] = new TH1D(tag, titleRapidity + cuts[i] , 26, -2.5, 2.5);
   }
 
 
@@ -259,6 +260,8 @@ for(Int_t i = 0; i < Reco_QQ_size; i++)
 	Double_t entriesOfGen = histogramsInvariantMass[0]->GetEntries();  
 	std::cout << "Number of entries " << entriesOfGen; 
 
+  // ------------- DRAW INVARIANT MASS ----------
+
   TCanvas *invariantMassCanvas = new TCanvas("invariantMassCanvas", "invMassCanv", 1000,1000);
 	TLegend *legend = new TLegend(0.65,0.57,0.98,0.76);
   for(Int_t i = 0; i < 7; i++)
@@ -272,7 +275,7 @@ for(Int_t i = 0; i < Reco_QQ_size; i++)
   }
   legend->Draw("SAME");
 
-  // ------------- ACOPLANARITY ----------
+  // ------------- DRAW ACOPLANARITY ----------
 
   TCanvas *acoplanarityCanvas = new TCanvas("acoCanvas", "acoCanv", 1000,1000);
   TLegend *acoLegend = new TLegend(0.65,0.57,0.98,0.76);
@@ -287,24 +290,27 @@ for(Int_t i = 0; i < Reco_QQ_size; i++)
 
   acoLegend->Draw("SAME");
 
-  // ------------- RAPIDITY -------------
+  // ------------- DRAW RAPIDITY -------------
 
   histogramsRapidity[0]->SetFillColor(kYellow); // TODO - Change into an array of colors
   Double_t entriesOfGenRapidity = histogramsRapidity[0]->GetEntries();  
 
   TCanvas *neued = new TCanvas("canvas", "neue", 1000,1000);
   TLegend *legendRapidity = new TLegend(0.65,0.57,0.98,0.76);
-  /*
-  for(Int_t i = 0; i < 4; i++)
+  
+  for(Int_t i = 0; i < 7; i++)
   {
     TString options = "SAME";
     if(i == 0) options = ""; // Reset the sucker
     histogramsRapidity[i]->SetFillColor(i * 5 + 8);  
-    histogramsRapidity[i]->Scale(1/entriesOfGenRapidity);  
+    //histogramsRapidity[i]->Scale(1/entriesOfGenRapidity);  
     histogramsRapidity[i]->Draw(options);
     legendRapidity->AddEntry(histogramsRapidity[i], histogramsRapidity[i]->GetTitle(), "f");
   }
-*/
+  neued->SetLogy();
+
+  // ---------------- DRAW RATIO INVMASS ---------------
+  TCanvas *rapidityCanvas = new TCanvas("invMassRatioCanvas", "Invariant Mass Ratio Canvas", 1000,1000);
   TH1D *histogramRatioRapidityCutNone = new TH1D("RatioRapid1", "MC - Reconstructed / Generated - Rapidity - No Cuts",binsRapidity,0, 5);
   TH1D *histogramRatioRapidityCutOne = new TH1D("RatioRapid2", "MC - Reconstructed / Generated - Rapidity - Pt < 4 && |Eta| < 2.4",binsRapidity,0, 5);
   TH1D *histogramRatioRapidityCutTwo = new TH1D("RatioRapid3", "MC - Reconstructed / Generated - Rapidity - Pt < 4 && |Eta| < 2.4 && Etc",binsRapidity,0, 5);
@@ -335,7 +341,6 @@ for(Int_t i = 0; i < Reco_QQ_size; i++)
       histogramRatiosRapidity[it]->Draw(mode);
       legendRapidity->AddEntry(histogramRatiosRapidity[it], histogramRatiosRapidity[it]->GetTitle(), "f");
   }
-  neued->SetLogy();
   legendRapidity->Draw("SAME");
 
   num->SetTitle("MC - InvMass - RECO / GEN");
@@ -343,8 +348,9 @@ for(Int_t i = 0; i < Reco_QQ_size; i++)
   num->SetMarkerStyle(20);
   num->SetMarkerSize(0.4);
   num->Draw("ep");
+  rapidityCanvas->SaveAs("invMassRatio.png");
 
-  TCanvas *rapidityRatioCanvas = new TCanvas("RapidityRatioCanvas", "Rapidity Ratio Canvas", 1000, 1000);
+  TCanvas *rapidityRatioCanvas = new TCanvas("rapidityRatioCanvas", "Rapidity Ratio Canvas", 1000, 1000);
 
   TH1D *numRapidity = (TH1D*) histogramsRapidity[6]->Clone("numRapidity");
   TH1D *denRapidity = (TH1D*) histogramsRapidity[0]->Clone("numRapidity");
@@ -354,4 +360,20 @@ for(Int_t i = 0; i < Reco_QQ_size; i++)
   numRapidity->SetMarkerStyle(20);
   numRapidity->SetMarkerSize(0.4);
   numRapidity->Draw("ep");
+  rapidityRatioCanvas->SaveAs("rapidityRatio.png");
+
+  //------------ ACOPLANARITY RATIO ------------
+  //TH1D* histogramRatiosAcoplanarity[7];
+
+  TCanvas *acoplanarityRatioCanvas = new TCanvas("acoplanarityRatioCanvas", "Acoplanarity Ratio Canvas", 1000, 1000);
+
+  TH1D* histogramAcoplanarityRatioDen = (TH1D*) histogramsAcoplanarity[0]->Clone("histogramAcoplanarityRatioDen");
+  TH1D* histogramAcoplanarityRatio = (TH1D*) histogramsAcoplanarity[6]->Clone("histogramAcoplanarityRatio");
+  histogramAcoplanarityRatio->Divide( histogramAcoplanarityRatioDen );
+  histogramAcoplanarityRatio->SetTitle("MC - Acoplanarity - RECO / GEN");
+  histogramAcoplanarityRatio->GetXaxis()->SetTitle("Aco = #pi - |#Delta #phi|");
+  histogramAcoplanarityRatio->SetMarkerStyle(20);
+  histogramAcoplanarityRatio->SetMarkerSize(0.4);
+  histogramAcoplanarityRatio->Draw("ep");
+  acoplanarityRatioCanvas->SaveAs("acoRatio.png");
 }
