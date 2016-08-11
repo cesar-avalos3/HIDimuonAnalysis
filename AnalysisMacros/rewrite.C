@@ -188,7 +188,7 @@ void rewrite()
   invMassEffNum->SetStats(0);
   invMassEffNum->Divide(invMassEffDen);
 
-  TCanvas *efficiencyCanvas = new TCanvas("Efficiency", "Efficiency - RECO / GEN ", 1000,1000);
+  TCanvas *efficiencyCanvas = new TCanvas("Efficiency", "Efficiency - RECO / GEN ", canvasXResolution,canvasYResolution);
   invMassEffNum->Draw("ep");
 
 
@@ -201,63 +201,14 @@ void rewrite()
   gStyle->SetOptStat(kFALSE);
   Int_t palette[] = {kGreen, kRed, kBlue, kPink, kYellow, kViolet, kMagenta};
 
-  TCanvas *invariantMassCanvasMC = new TCanvas("invMassCanvMC", "Invariant Mass Canvas - MC", 1000, 1000);
-  invariantMassCanvasMC->SetLogy();
-  invariantMassCanvasMC->SetLogx();
-
-  TLegend *legendMassMC = new TLegend(0.64,0.61,0.92,0.76);
-
-  for(int i = 0; i < 7; i++)
-  {
-  	TString mode = "SAME";
-  	if(i == 0) mode = "";
-  	histogramsInvariantMassMC[i]->SetFillColor(palette[i]);
-  	histogramsInvariantMassMC[i]->Draw(mode);
-  	histogramsInvariantMassMC[i]->Write();
-  	legendMassMC->AddEntry(histogramsInvariantMassMC[i], histogramsInvariantMassMC[i]->GetTitle(), "f");
-  }
-  legendMassMC->Draw("SAME");
-
-  TCanvas *invariantMassCanvasDATA = new TCanvas("invMassCanvDATA","Invariant Mass Canvas - DATA",1000,1000);
-  invariantMassCanvasDATA->SetLogy();
-  invariantMassCanvasDATA->SetLogx();
-
-  TLegend *legendMassData = new TLegend(0.64,0.61,0.92,0.76);
-  for(int i = 0; i < 7; i++)
-  {
-  	TString mode = "SAME";
-  	if(i == 0) mode = "";
-  	histogramsInvariantMassDATA[i]->SetFillColor(palette[i]);
-  	histogramsInvariantMassDATA[i]->Draw(mode);
-   	histogramsInvariantMassDATA[i]->Write();
-   	legendMassData->AddEntry(histogramsInvariantMassDATA[i], histogramsInvariantMassDATA[i]->GetTitle(), "f");
-  }
-  legendMassData->Draw("SAME");
-  
-  TCanvas* dataVersusMC = new TCanvas("dataVMC", "dVMC", 1000,1000);
   Double_t numberOfRecoEventsMC   = histogramsInvariantMassMC[6]->Integral();
   Double_t numberOfRecoEventsDATA = histogramsInvariantMassDATA[5]->Integral();
 
-  TLegend *legendMassDATAMC = new TLegend(0.64,0.61,0.92,0.76);
-  TH1D *finalCutMC = (TH1D*) histogramsInvariantMassMC[6]->Clone("finalCutMC");
-  TH1D *finalCutDATA = (TH1D*) histogramsInvariantMassDATA[5]->Clone("finalCutDATA");
 
-  legendMassDATAMC->AddEntry(finalCutDATA, finalCutDATA->GetTitle(), "f");
-  legendMassDATAMC->AddEntry(finalCutMC, finalCutMC->GetTitle(), "f");
+  drawAllHistogramsBasic(histogramsInvariantMassMC, 7, "invariantMassMC", "Invariant Mass - MC", palette,1, 1);
+  drawAllHistogramsBasic(histogramsInvariantMassDATA, 7, "invariantMassData", "Invariant Mass - DATA", palette,1, 1);
 
-  finalCutMC->Scale(1/numberOfRecoEventsMC);
-  finalCutDATA->Scale(1/numberOfRecoEventsDATA);
+  drawHistogramsMCvDATA(histogramsInvariantMassMC[6], histogramsInvariantMassDATA[5], "invariantMassMCvDATA", "Invariant Mass - MC vs DATA", 1, 1, numberOfRecoEventsMC, numberOfRecoEventsDATA);
 
-  finalCutMC->SetFillColor(kGreen);
-  finalCutMC->Draw();
-  finalCutDATA->SetFillColor(kWhite);
-  finalCutDATA->SetMarkerStyle(4);
-  finalCutDATA->SetMarkerSize(1.3);
-  finalCutDATA->Draw("SAME&&P");
-  
-  legendMassDATAMC->Draw("SAME");
-
-  finalCutDATA->Write();
-  finalCutMC->Write();
 
 }

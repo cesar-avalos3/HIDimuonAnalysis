@@ -27,6 +27,10 @@
   TString titleRapidityMC = TString("MC - #mu^{+}#mu^{-} - Rapidity - ");
   TString titleRapidityDATA = TString("DATA - #mu^{+}#mu^{-} - Rapidity - ");
 
+  Double_t TLegendSize[] = {0.611, 0.85, 0.984, 0.65};
+  Int_t canvasXResolution = 800;
+  Int_t canvasYResolution = 800;
+
   // Risky business
   // Mode 0 is MC - Mode 1 is DATA
   void createArrayOfHistogramsInvariantMass(TH1D** histArray, Int_t mode)
@@ -131,3 +135,50 @@ bool Cut(TLorentzVector* mumi, TLorentzVector* mupl, TLorentzVector* dimu,Int_t 
         return false;
 }
 
+
+// Function requires an array of histograms, the array size, the title the canvas will have, the title above the first histogram, an arrya of colors,
+// every histogram will be drawn using the same style of a solid color and no lines.
+void drawAllHistogramsBasic(TH1D** arrayHistogram, Int_t arraySize, TString canvasTitle, TString mainHistogramTitle, Int_t* colorsArray,Int_t logY, Int_t logX)
+{
+
+  TCanvas* temp = new TCanvas(canvasTitle, canvasTitle, canvasXResolution,canvasYResolution);
+  if(logX) temp->SetLogy();
+  if(logY) temp->SetLogx();
+
+  TLegend *legendTemp = new TLegend(TLegendSize[0],TLegendSize[1],TLegendSize[2],TLegendSize[3]);
+  arrayHistogram[0]->SetTitle(mainHistogramTitle);
+  for(int i = 0; i < arraySize; i++)
+  {
+  	TString mode = "SAME";
+  	if(i == 0) mode = "";
+  	arrayHistogram[i]->SetFillColor(colorsArray[i]);
+  	arrayHistogram[i]->Draw(mode);
+  	arrayHistogram[i]->Write();
+  	legendTemp->AddEntry(arrayHistogram[i], arrayHistogram[i]->GetTitle(), "f");
+  }
+
+  legendTemp->Draw("SAME");
+}
+
+void drawHistogramsMCvDATA(TH1D *histMassMC, TH1D *histMassDATA, TString canvasTitle, TString mainHistogramTitle, Int_t logY, Int_t logX, Int_t normFactorMC, Int_t normFactorDATA)
+{
+	TCanvas* temp = new TCanvas(canvasTitle, canvasTitle, canvasXResolution,canvasYResolution);
+	if(logX) temp->SetLogy();
+  	if(logY) temp->SetLogx();
+
+	histMassMC->Scale(1/histMassMC->Integral());
+	histMassDATA->Scale(1/histMassDATA->Integral());
+
+  	TLegend *legendTemp = new TLegend(TLegendSize[0],TLegendSize[1],TLegendSize[2],TLegendSize[3]);
+
+	histMassMC->SetTitle(mainHistogramTitle);
+	histMassMC->SetFillColor(kGreen);
+	histMassDATA->SetFillColor(kWhite);
+	histMassDATA->SetMarkerStyle(4);
+	histMassDATA->SetMarkerSize(1.3);
+	histMassMC->Draw();
+	histMassDATA->Draw("SAME&&P");
+	legendTemp->AddEntry(histMassMC, "MC", "f");
+	legendTemp->AddEntry(histMassDATA, "DATA");
+	legendTemp->Draw("SAME");
+}
