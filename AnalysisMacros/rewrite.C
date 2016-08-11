@@ -1,5 +1,5 @@
-#include "rewrite.h"
-void rewrite()
+#include "FullAnalysis.h"
+void FullAnalysis()
 {
 	TH1D *histogramsInvariantMassMC[7];
 	TH1D *histogramsRapidityMC[7];
@@ -11,6 +11,9 @@ void rewrite()
 
 	createArrayOfHistogramsInvariantMass(histogramsInvariantMassMC,0);
 	createArrayOfHistogramsInvariantMass(histogramsInvariantMassDATA,1);
+
+	createArrayOfHistogramsRapidity(histogramsRapidityMC, 0);
+	createArrayOfHistogramsRapidity(histogramsRapidityDATA, 1);
 
 	TFile* inFileMC   = new TFile("../Tree/OniaTree_MC_ppRec_tracks.root"); 
 	TFile* inFileDATA = new TFile("../Tree/OniaTree_part_NoCuts_allTrig.root");
@@ -199,7 +202,7 @@ void rewrite()
  // --------------------- DRAW THE SUCKERS ------------------------------
 
   gStyle->SetOptStat(kFALSE);
-  Int_t palette[] = {kGreen, kRed, kBlue, kPink, kYellow, kViolet, kMagenta};
+  Int_t palette[] = {kGreen, kRed, kBlue, kTeal, kYellow, kViolet, kMagenta};
 
   Double_t numberOfRecoEventsMC   = histogramsInvariantMassMC[6]->Integral();
   Double_t numberOfRecoEventsDATA = histogramsInvariantMassDATA[5]->Integral();
