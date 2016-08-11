@@ -34,11 +34,11 @@
   // Risky business
   // Mode 0 is MC - Mode 1 is DATA
   void createArrayOfHistogramsInvariantMass(TH1D** histArray, Int_t mode)
-  {	
+  {
   	TString modeString = MCtag;
   	TString titleInvariantMass = titleInvariantMassMC;
-  	if(mode == 1) {modeString = DATAtag; titleInvariantMass = titleInvariantMassDATA;} 
-  	
+  	if(mode == 1) {modeString = DATAtag; titleInvariantMass = titleInvariantMassDATA;}
+
 
   Double_t varBinMass[]     = {10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0,18.0, 19.0, 20.0,22.0,24.0,26.0,28.0,30.0,33.0,36.0,39.0,42.0,46.0,49.0,55.0,65.0,75.0,95.0,100.0};
   	for(Int_t i = 0; i < 7; i++)
@@ -55,12 +55,12 @@
   }
 
   // Mode 0 is MC - Mode 1 is DATA
-  TH1D **createArrayOfHistogramsRapidity(Int_t mode)
-  {	
+  void createArrayOfHistogramsRapidity(TH1D** histArray, Int_t mode)
+  {
   	TH1D *temp[7];
   	TString modeString = MCtag;
   	TString titleInvariantMass = titleInvariantMassMC;
-  	if(modeString == 1) {modeString = DATAtag; titleInvariantMass = titleInvariantMassDATA;} 
+  	if(modeString == 1) {modeString = DATAtag; titleInvariantMass = titleInvariantMassDATA;}
 
   	for(Int_t i = 0; i < 7; i++)
   	{
@@ -72,17 +72,17 @@
 
   		temp[i] = new TH1D(tag, titleInvariantMass + cuts[i], 200, 0, 100);
   	}
-  	return temp;
+
   }
 
-  
+
 
   bool goodEventSelector(Int_t eventNumber)
 {
 	switch(eventNumber)
 	{
 		case(1831): case(3218): case(137118): case(152490): case(219038):
-		case(386033): case(503861): case(633631): case(693277): case(695696): 
+		case(386033): case(503861): case(633631): case(693277): case(695696):
 		case(745655): case(829393): case(879798): case(881615): case(924552):
 		case(930862): case(1046707): case(1061755): case(1144019): case(1157373):
 		case(1166346): case(1252551): case(1454766): case(1532136): case(1565490):
