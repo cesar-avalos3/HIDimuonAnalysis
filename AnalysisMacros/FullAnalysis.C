@@ -11,11 +11,10 @@ void FullAnalysis()
 
 	createArrayOfHistogramsInvariantMass(histogramsInvariantMassMC,0);
 	createArrayOfHistogramsInvariantMass(histogramsInvariantMassDATA,1);
-
 	createArrayOfHistogramsRapidity(histogramsRapidityMC, 0);
 	createArrayOfHistogramsRapidity(histogramsRapidityDATA, 1);
 
-	TFile* inFileMC   = new TFile("../Tree/OniaTree_MC_ppRec_tracks.root"); 
+	TFile* inFileMC   = new TFile("../Tree/OniaTree_MC_ppRec_tracks.root");
 	TFile* inFileDATA = new TFile("../Tree/OniaTree_part_NoCuts_allTrig.root");
 
 	TTree* myTreeMC = (TTree*) inFileMC->Get("hionia/myTree");
@@ -95,7 +94,7 @@ void FullAnalysis()
 	myTreeMC->SetBranchAddress("Reco_QQ_mupl_4mom", &Reco_QQ_mupl_4mom_MC, &b_Reco_QQ_mupl_4mom_MC);
 	myTreeMC->SetBranchAddress("Reco_QQ_mumi_4mom", &Reco_QQ_mumi_4mom_MC, &b_Reco_QQ_mumi_4mom_MC);
 	myTreeMC->SetBranchAddress("Reco_QQ_sign", &Reco_QQ_sign_MC, &b_Reco_QQ_sign_MC);
-	
+
 	//Set branches addresses of DATA
 	myTreeDATA->SetBranchAddress("Ntracks", &Ntracks_DATA, &b_Ntracks_DATA);
 	myTreeDATA->SetBranchAddress("Reco_QQ_size", &Reco_QQ_size_DATA, &b_Reco_QQ_size_DATA);
@@ -113,18 +112,18 @@ void FullAnalysis()
     if (Gen_QQ_size_MC == 0) continue;
   	//Create Lorentz Vectors
     for(Int_t i = 0; i < Gen_QQ_size_MC; i++)
-    {
-		TLorentzVector *mupl_GEN = (TLorentzVector*) Gen_QQ_mupl_4mom_MC->At(i);
-		TLorentzVector *mumi_GEN = (TLorentzVector*) Gen_QQ_mumi_4mom_MC->At(i);
-		TLorentzVector *dimu_GEN = (TLorentzVector*) Gen_QQ_4mom_MC->At(i);
-		for(Int_t u = 0; u < 1; u++)
-		{
-			if(Cut(mumi_GEN, mupl_GEN, dimu_GEN, 0, Ntracks_MC, u))
-			{
-      		//Fill histogramsInvariantMass invariantMass of dimuon
-				histogramsInvariantMassMC[u]->Fill(dimu_GEN->M());
-				//histogramsRapidity[u]->Fill(dimu_GEN->Rapidity());
-				//histogramsAcoplanarity[u]->Fill(1 - (TMath::Abs(mupl_GEN->Phi() - mumi_GEN->Phi() )) / TMath::Pi() );
+    	{
+				TLorentzVector *mupl_GEN = (TLorentzVector*) Gen_QQ_mupl_4mom_MC->At(i);
+				TLorentzVector *mumi_GEN = (TLorentzVector*) Gen_QQ_mumi_4mom_MC->At(i);
+				TLorentzVector *dimu_GEN = (TLorentzVector*) Gen_QQ_4mom_MC->At(i);
+				for(Int_t u = 0; u < 1; u++)
+					{
+						if(Cut(mumi_GEN, mupl_GEN, dimu_GEN, 0, Ntracks_MC, u))
+						{
+      			//Fill histogramsInvariantMass invariantMass of dimuon
+							histogramsInvariantMassMC[u]->Fill(dimu_GEN->M());
+							histogramsRapidityMC[u]->Fill(dimu_GEN->Rapidity());
+							//histogramsAcoplanarity[u]->Fill(1 - (TMath::Abs(mupl_GEN->Phi() - mumi_GEN->Phi() )) / TMath::Pi() );
       			}
       		}
       }
@@ -143,7 +142,7 @@ void FullAnalysis()
             {
               //Fill histogramsInvariantMass invariantMass of dimuon
               histogramsInvariantMassMC[u]->Fill(dimu_RECO->M());
-              //histogramsRapidity[u]->Fill(dimu_RECO->Rapidity());
+              histogramsRapidityMC[u]->Fill(dimu_RECO->Rapidity());
               //histogramsAcoplanarity[u]->Fill(1 - (TMath::Abs(mupl_RECO->Phi() - mumi_RECO->Phi() )) / TMath::Pi() );
             }
           }
@@ -172,7 +171,7 @@ void FullAnalysis()
             {
               //Fill histogramsInvariantMass invariantMass of dimuon
               histogramsInvariantMassDATA[u]->Fill(dimu_RECO->M());
-              //histogramsRapidityDATA[u]->Fill(dimu_RECO->Rapidity());
+              histogramsRapidityDATA[u]->Fill(dimu_RECO->Rapidity());
               //histogramsAcoplanarityDATA[u]->Fill(1 - (TMath::Abs(mupl_RECO->Phi() - mumi_RECO->Phi() )) / TMath::Pi() );
             }
           }
@@ -207,11 +206,14 @@ void FullAnalysis()
   Double_t numberOfRecoEventsMC   = histogramsInvariantMassMC[6]->Integral();
   Double_t numberOfRecoEventsDATA = histogramsInvariantMassDATA[5]->Integral();
 
-
+	//(TH1D** arrayHistogram, Int_t arraySize, TString canvasTitle, TString mainHistogramTitle, Int_t* colorsArray,Int_t logY, Int_t logX)
   drawAllHistogramsBasic(histogramsInvariantMassMC, 7, "invariantMassMC", "Invariant Mass - MC", palette,1, 1);
   drawAllHistogramsBasic(histogramsInvariantMassDATA, 7, "invariantMassData", "Invariant Mass - DATA", palette,1, 1);
+	drawAllHistogramsBasic(histogramsRapidityMC, 7, "rapidityMC", "Rapidity - MC", palette, 1, 0);
+	drawAllHistogramsBasic(histogramsRapidityDATA, 7, "rapidityDATA", "Rapidity - DATA", palette, 1, 0);
 
+	//(TH1D *histMassMC, TH1D *histMassDATA, TString canvasTitle, TString mainHistogramTitle, Int_t logY, Int_t logX, Int_t normFactorMC, Int_t normFactorDATA)
   drawHistogramsMCvDATA(histogramsInvariantMassMC[6], histogramsInvariantMassDATA[5], "invariantMassMCvDATA", "Invariant Mass - MC vs DATA", 1, 1, numberOfRecoEventsMC, numberOfRecoEventsDATA);
-
+	drawHistogramsMCvDATA(histogramsRapidityMC[6], histogramsRapidityDATA[5], "rapidityMCvDATA", "Rapidity - MC vs DATA", 1, 0, 1, 1);
 
 }
