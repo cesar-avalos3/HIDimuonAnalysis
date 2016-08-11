@@ -10,7 +10,6 @@
   TString MCtag = TString("MC_");
   TString DATAtag = TString("DATA_");
 
-
   TString ratioTag = TString("ratio");
 
   TString cut0 = TString("GEN - No cut");
@@ -30,28 +29,25 @@
 
   // Risky business
   // Mode 0 is MC - Mode 1 is DATA
-  TH1D **createArrayOfHistogramsInvariantMass(Int_t mode)
+  void createArrayOfHistogramsInvariantMass(TH1D** histArray, Int_t mode)
   {	
-  	TH1D *temp[7];
   	TString modeString = MCtag;
   	TString titleInvariantMass = titleInvariantMassMC;
-  	if(modeString == 1) {modeString = DATAtag; titleInvariantMass = titleInvariantMassDATA;} 
+  	if(mode == 1) {modeString = DATAtag; titleInvariantMass = titleInvariantMassDATA;} 
   	
-  	Double_t varBinMass[] = {0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0, 19.0, 20.0,22.0, 24.0, 26.0, 28.0, 30.0, 35.0, 40.0, 50.0, 75.0};
 
+  Double_t varBinMass[]     = {10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0,18.0, 19.0, 20.0,22.0,24.0,26.0,28.0,30.0,33.0,36.0,39.0,42.0,46.0,49.0,55.0,65.0,75.0,95.0,100.0};
   	for(Int_t i = 0; i < 7; i++)
   	{
   		TString tag = modeString;
   		tag += recTag;
   		if(i == 0 && mode == 0){tag = genTag;}
-  		if(mode == 0) tag += MCtag;
-  		else tag += DATAtag;
   		tag += i;
   		tag += invTag;
-
-  		temp[i] = new TH1D(tag, titleInvariantMass + cuts[i], 29,varBinMass);
+  		histArray[i] = new TH1D(tag, titleInvariantMass + cuts[i], 26,varBinMass);
+  		histArray[i]->GetXaxis()->SetTitle("Invariant Mass - (GeV / C)");
+  		histArray[i]->GetYaxis()->SetTitle("Counts");
   	}
-  	return temp;
   }
 
   // Mode 0 is MC - Mode 1 is DATA
