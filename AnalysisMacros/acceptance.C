@@ -62,7 +62,7 @@ TH1D *histogramRatiosBinByBin(TH1D *Numerator, TH1D *Denominator, Int_t numberOf
 }
 
 // TODO Implement more variables, like rapidity and acoplanarity
-void efficiencyUndAcceptance()
+void acceptance()
 {
   TFile* inFile = new TFile("../Tree/OniaTree_MC_ppRec_tracks.root");
 
@@ -109,7 +109,9 @@ void efficiencyUndAcceptance()
   myTree->SetBranchAddress("Gen_QQ_mupl_4mom", &Gen_QQ_mupl_4mom, &b_Gen_QQ_mupl_4mom);
   myTree->SetBranchAddress("Gen_QQ_mumi_4mom", &Gen_QQ_mumi_4mom, &b_Gen_QQ_mumi_4mom);
 
-  myTree->SetBranchAddress("Reco_trk_size", &Ntracks, &b_Ntracks);
+
+  //Not used here, no such equivalent for generated events.
+  myTree->SetBranchAddress("Reco_QQ_Ntrk", &Ntracks, &b_Ntracks);
 
 
   myTree->SetBranchAddress("Reco_QQ_size", &Reco_QQ_size, &b_Reco_QQ_size);
@@ -122,8 +124,7 @@ void efficiencyUndAcceptance()
   // Dynamically create the invariant Mass Histograms - Could be extended to create every other type of histograms within it
   TH1D *histogramsInvariantMass[7];
 
-  Double_t varBinMass[] = {0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0, 19.0, 20.0,22.0, 24.0, 26.0, 28.0, 30.0, 35.0, 40.0, 50.0, 75.0};
-  Int_t binsMass = 29;
+  Int_t binsMass = 100;
   TString titleInvariantMass = TString("MC - #mu^{+}#mu^{-} - InvariantMass - ");
   Int_t numberOfInvariantMassHistograms = 7;
 
@@ -135,7 +136,7 @@ void efficiencyUndAcceptance()
     if(i == 0) tag = genTag;
     tag += i;
     tag += invTag;
-    histogramsInvariantMass[i] = new TH1D(tag, titleInvariantMass + cuts[i] , binsMass, varBinMass);
+    histogramsInvariantMass[i] = new TH1D(tag, titleInvariantMass + cuts[i] , binsMass, 0, 100);
   }
 
   // Settings for Rapidity
@@ -179,44 +180,26 @@ void efficiencyUndAcceptance()
   		myTree->GetEvent(eventIterator);
     
     if (Gen_QQ_size == 0) continue;
-  	//Create Lorentz Vectors
+  	
+    //Create Lorentz Vectors
       for(Int_t i = 0; i < Gen_QQ_size; i++)
       {
       	TLorentzVector *mupl_GEN = (TLorentzVector*) Gen_QQ_mupl_4mom->At(i);
       	TLorentzVector *mumi_GEN = (TLorentzVector*) Gen_QQ_mumi_4mom->At(i);
       	TLorentzVector *dimu_GEN = (TLorentzVector*) Gen_QQ_4mom->At(i);
 
-      	for(Int_t u = 0; u < 1; u++)
+      	for(Int_t u = 0; u < 7; u++)
       		{
-			if(Cut(mumi_GEN, mupl_GEN, dimu_GEN, 0, Ntracks, u))
-      			{
+			       if(Cut(mumi_GEN, mupl_GEN, dimu_GEN, 0, 0, u))
+      			 {
       				//Fill histogramsInvariantMass invariantMass of dimuon
       				histogramsInvariantMass[u]->Fill(dimu_GEN->M());
               histogramsRapidity[u]->Fill(dimu_GEN->Rapidity());
               histogramsAcoplanarity[u]->Fill(1 - (TMath::Abs(mupl_GEN->Phi() - mumi_GEN->Phi() )) / TMath::Pi() );
-      			}
+      			 }
       		}
       }
 
-// Reconstructed events next
-for(Int_t i = 0; i < Reco_QQ_size; i++)
-      {
-        TLorentzVector *mupl_RECO = (TLorentzVector*) Reco_QQ_mupl_4mom->At(i);
-        TLorentzVector *mumi_RECO = (TLorentzVector*) Reco_QQ_mumi_4mom->At(i);
-        TLorentzVector *dimu_RECO = (TLorentzVector*) Reco_QQ_4mom->At(i);
-        TLorentzVector *vectors[] = {mupl_RECO, mumi_RECO, dimu_RECO};
-
-        for(Int_t u = 1; u < 7; u++)
-          {
-      if(Cut(mumi_RECO, mupl_RECO, dimu_RECO, Reco_QQ_sign,Ntracks, u))
-            {
-              //Fill histogramsInvariantMass invariantMass of dimuon
-              histogramsInvariantMass[u]->Fill(dimu_RECO->M());
-              histogramsRapidity[u]->Fill(dimu_RECO->Rapidity());
-              histogramsAcoplanarity[u]->Fill(1 - (TMath::Abs(mupl_RECO->Phi() - mumi_RECO->Phi() )) / TMath::Pi() );
-            }
-          }
-      }
   }
 
   // Draw histogramsInvariantMass
@@ -239,7 +222,7 @@ for(Int_t i = 0; i < Reco_QQ_size; i++)
   }
   legend->Draw("SAME");
   invariantMassCanvas->SetLogy();
-  invariantMassCanvas->SaveAs("resultsMC/invMassMCEff.png");
+  invariantMassCanvas->SaveAs("resultsMC/invMassMCAcc.png");
 
   // ------------- DRAW ACOPLANARITY ----------
 
@@ -256,7 +239,7 @@ for(Int_t i = 0; i < Reco_QQ_size; i++)
 
   acoLegend->Draw("SAME");
   acoplanarityCanvas->SetLogy();
-  acoplanarityCanvas->SaveAs("resultsMC/acoMCEff.png");
+  acoplanarityCanvas->SaveAs("resultsMC/acoMCAcc.png");
 
   // ------------- DRAW RAPIDITY -------------
 
@@ -276,12 +259,12 @@ for(Int_t i = 0; i < Reco_QQ_size; i++)
     legendRapidity->AddEntry(histogramsRapidity[i], histogramsRapidity[i]->GetTitle(), "f");
   }
   neued->SetLogy();
-  neued->SaveAs("resultsMC/rapidityMCEff.png");
+  neued->SaveAs("resultsMC/rapidityMCAcc.png");
   // ---------------- DRAW RATIO INVMASS ---------------
   TCanvas *rapidityCanvas = new TCanvas("invMassRatioCanvas", "Invariant Mass Ratio Canvas", 1000,1000);
-  TH1D *histogramRatioRapidityCutNone = new TH1D("RatioRapid1", "MC - Reconstructed / Generated - Rapidity - No Cuts",binsRapidity,0, 5);
-  TH1D *histogramRatioRapidityCutOne = new TH1D("RatioRapid2", "MC - Reconstructed / Generated - Rapidity - Pt < 4 && |Eta| < 2.4",binsRapidity,0, 5);
-  TH1D *histogramRatioRapidityCutTwo = new TH1D("RatioRapid3", "MC - Reconstructed / Generated - Rapidity - Pt < 4 && |Eta| < 2.4 && Etc",binsRapidity,0, 5);
+  TH1D *histogramRatioRapidityCutNone = new TH1D("RatioRapid1", "MC - Generated_{cuts} / Generated - Rapidity - No Cuts",binsRapidity,0, 5);
+  TH1D *histogramRatioRapidityCutOne = new TH1D("RatioRapid2", "MC - Generated_{cuts} / Generated - Rapidity - Pt < 4 && |Eta| < 2.4",binsRapidity,0, 5);
+  TH1D *histogramRatioRapidityCutTwo = new TH1D("RatioRapid3", "MC - Generated_{cuts} / Generated - Rapidity - Pt < 4 && |Eta| < 2.4 && Etc",binsRapidity,0, 5);
 
   // TODO fix ugliness
 
@@ -298,30 +281,32 @@ for(Int_t i = 0; i < Reco_QQ_size; i++)
 
   TH1D *den = (TH1D*) histogramsInvariantMass[0]->Clone("den");
   TH1D *num = (TH1D*) histogramsInvariantMass[6]->Clone("num");
+
   num->Sumw2();
   num->SetStats(0);
   num->Divide(num, den, 1, 1, "B");
 
+
   legendRapidity->Draw("SAME");
 
-  num->SetTitle("MC - InvMass - RECO / GEN");
+  num->SetTitle("MC - InvMass - GEN_{cuts} / GEN");
   num->GetXaxis()->SetTitle("Invariant Mass - GeV / C");
   num->SetMarkerStyle(20);
   num->SetMarkerSize(0.4);
   num->Draw("ep");
-  rapidityCanvas->SaveAs("resultsMC/invMassRatioMCEff.png");
+  rapidityCanvas->SaveAs("resultsMC/invMassRatioMCAcc.png");
 
   TCanvas *rapidityRatioCanvas = new TCanvas("rapidityRatioCanvas", "Rapidity Ratio Canvas", 1000, 1000);
 
   TH1D *numRapidity = (TH1D*) histogramsRapidity[6]->Clone("numRapidity");
   TH1D *denRapidity = (TH1D*) histogramsRapidity[0]->Clone("numRapidity");
   numRapidity->Divide(denRapidity);
-  numRapidity->SetTitle("MC - Rapidity - RECO / GEN");
+  numRapidity->SetTitle("MC - Rapidity - GEN_{cuts} / GEN");
   numRapidity->GetXaxis()->SetTitle("Rapidity");
   numRapidity->SetMarkerStyle(20);
   numRapidity->SetMarkerSize(0.4);
   numRapidity->Draw("ep");
-  rapidityRatioCanvas->SaveAs("resultsMC/rapidityRatioMCEff.png");
+  rapidityRatioCanvas->SaveAs("resultsMC/rapidityRatioMCAcc.png");
 
   //------------ ACOPLANARITY RATIO ------------
   //TH1D* histogramRatiosAcoplanarity[7];
@@ -331,14 +316,15 @@ for(Int_t i = 0; i < Reco_QQ_size; i++)
   TH1D* histogramAcoplanarityRatioDen = (TH1D*) histogramsAcoplanarity[0]->Clone("histogramAcoplanarityRatioDen");
   TH1D* histogramAcoplanarityRatio = (TH1D*) histogramsAcoplanarity[6]->Clone("histogramAcoplanarityRatio");
   histogramAcoplanarityRatio->Divide( histogramAcoplanarityRatioDen );
-  histogramAcoplanarityRatio->SetTitle("MC - Acoplanarity - RECO / GEN");
+  histogramAcoplanarityRatio->SetTitle("MC - Acoplanarity - GEN_{cuts} / GEN");
   histogramAcoplanarityRatio->GetXaxis()->SetTitle("Aco = #pi - |#Delta #phi|");
   histogramAcoplanarityRatio->SetMarkerStyle(20);
   histogramAcoplanarityRatio->SetMarkerSize(0.4);
   histogramAcoplanarityRatio->Draw("ep");
-  acoplanarityRatioCanvas->SaveAs("resultsMC/acoRatioMCEff.png");
+  acoplanarityRatioCanvas->SaveAs("resultsMC/acoRatioMCAcc.png");
 
-  TFile *out = new TFile("efficiencyMC.root","RECREATE");
+  TFile *out = new TFile("acceptanceMC.root","RECREATE");
+  num->SetFillColor(kYellow);
   num->Write();
 
 }
