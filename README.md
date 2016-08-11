@@ -5,9 +5,4 @@
 To use the macro:
 
 - Put Trees under Trees/ directory
-- Run "root efficiency.C" - To run the efficiency analysis
-- Run "root acceptance.C" - To run the acceptance analysis
-
-Experimental:
-
-- Run rewrite.C to perform a full analysis
+- Run "root AnalysisMacro/FullAnalysis.C to perform the full analysis
