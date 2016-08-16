@@ -35,7 +35,7 @@ void FullAnalysis()
 	TBranch         *b_Gen_QQ_4mom_MC;   //!
 	TBranch         *b_Gen_QQ_mupl_4mom_MC;   //!
 	TBranch         *b_Gen_QQ_mumi_4mom_MC;   //!
-	Int_t		     Reco_QQ_sign_MC;
+	Int_t		         Reco_QQ_sign_MC;
 	Int_t            Reco_QQ_size_MC;
 	TClonesArray    *Reco_QQ_4mom_MC;
 	TClonesArray    *Reco_QQ_mupl_4mom_MC;
@@ -56,7 +56,7 @@ void FullAnalysis()
 	TBranch         *b_Gen_QQ_4mom_DATA;   //!
 	TBranch         *b_Gen_QQ_mupl_4mom_DATA;   //!
 	TBranch         *b_Gen_QQ_mumi_4mom_DATA;   //!
-	Int_t		     Reco_QQ_sign_DATA;
+	Int_t		         Reco_QQ_sign_DATA;
 	Int_t            Reco_QQ_size_DATA;
 	TClonesArray    *Reco_QQ_4mom_DATA;
 	TClonesArray    *Reco_QQ_mupl_4mom_DATA;
@@ -168,8 +168,8 @@ void FullAnalysis()
   {
   		if(!goodEventSelector(eventIterator)) eventIterator += 2;
   		myTreeDATA->GetEvent(eventIterator);
-  	//std::cout << "Event number: " << eventIterator << "\n";
-	for(Int_t i = 0; i < Reco_QQ_size_DATA; i++)
+  	  //std::cout << "Event number: " << eventIterator << "\n";
+			for(Int_t i = 0; i < Reco_QQ_size_DATA; i++)
       {
         TLorentzVector *mupl_RECO = (TLorentzVector*) Reco_QQ_mupl_4mom_DATA->At(i);
         TLorentzVector *mumi_RECO = (TLorentzVector*) Reco_QQ_mumi_4mom_DATA->At(i);
@@ -178,7 +178,7 @@ void FullAnalysis()
 
         for(Int_t u = 0; u < 7; u++)
           {
-      if(Cut(mumi_RECO, mupl_RECO, dimu_RECO, Reco_QQ_sign_DATA,Ntracks_DATA, 1 + u))
+      			if(Cut(mumi_RECO, mupl_RECO, dimu_RECO, Reco_QQ_sign_DATA,Ntracks_DATA, 1 + u))
             {
               //Fill histogramsInvariantMass invariantMass of dimuon
               histogramsInvariantMassDATA[u]->Fill(dimu_RECO->M());
@@ -189,7 +189,7 @@ void FullAnalysis()
       }
   }
 
-	// Set up the canvas - Hide the stat box
+ // Set up the canvas - Hide the stat box
 	gStyle->SetOptStat(kFALSE);
 
  // -------------------- Calculate Efficiency and Acceptance -----------------------
