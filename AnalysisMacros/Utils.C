@@ -31,6 +31,9 @@ Double_t TLegendSize[] = {0.611, 0.85, 0.984, 0.65};
 Int_t canvasXResolution = 800;
 Int_t canvasYResolution = 800;
 
+Double_t varBinMass[]     = {10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0,18.0, 19.0, 20.0,22.0,24.0,26.0,28.0,30.0,33.0,36.0,39.0,42.0,46.0,49.0,55.0,65.0,75.0,95.0,100.0};
+
+
 // Risky business
 // Mode 0 is MC - Mode 1 is DATA
 void createArrayOfHistogramsInvariantMass(TH1D** histArray, Int_t mode)
@@ -40,7 +43,6 @@ void createArrayOfHistogramsInvariantMass(TH1D** histArray, Int_t mode)
         if(mode == 1) {modeString = DATAtag; titleInvariantMass = titleInvariantMassDATA; }
 
 
-        Double_t varBinMass[]     = {10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0,18.0, 19.0, 20.0,22.0,24.0,26.0,28.0,30.0,33.0,36.0,39.0,42.0,46.0,49.0,55.0,65.0,75.0,95.0,100.0};
         for(Int_t i = 0; i < 7; i++)
         {
                 TString tag = modeString;
@@ -74,7 +76,6 @@ void createArrayOfHistogramsRapidity(TH1D** histArray, Int_t mode)
 }
 
 
-
 bool goodEventSelector(Int_t eventNumber)
 {
         switch(eventNumber)
@@ -104,6 +105,8 @@ bool Cut(TLorentzVector* mumi, TLorentzVector* mupl, TLorentzVector* dimu,Int_t 
         switch(CUTS)
         {
         case (0):
+                return true;
+                break;
         case (1):
                 return true;
                 break;
@@ -156,6 +159,7 @@ void drawAllHistogramsBasic(TH1D** arrayHistogram, Int_t arraySize, TString canv
         }
 
         legendTemp->Draw("SAME");
+        temp->SaveAs(mainHistogramTitle+".png");
 }
 
 void drawHistogramsMCvDATA(TH1D *histMassMC, TH1D *histMassDATA, TString canvasTitle, TString mainHistogramTitle, Int_t logY, Int_t logX, Int_t normFactorMC, Int_t normFactorDATA)
@@ -179,4 +183,5 @@ void drawHistogramsMCvDATA(TH1D *histMassMC, TH1D *histMassDATA, TString canvasT
         legendTemp->AddEntry(histMassMC, "MC", "f");
         legendTemp->AddEntry(histMassDATA, "DATA");
         legendTemp->Draw("SAME");
+        temp->SaveAs(mainHistogramTitle+".png");
 }

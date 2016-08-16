@@ -1,4 +1,5 @@
 #include "FullAnalysis.h"
+
 void FullAnalysis()
 {
 	TH1D *histogramsInvariantMassMC[7];
@@ -8,6 +9,8 @@ void FullAnalysis()
 	TH1D *histogramsInvariantMassDATA[7];
 	TH1D *histogramsRapidityDATA[7];
 	TH1D *histogramsAcoplanarityDATA[7];
+
+	TH1D *histogramsInvariantMassMC_GEN_CUTS = new TH1D("GENcuts", "Invariant Mass - Generated with cuts", 26,varBinMass);
 
 	createArrayOfHistogramsInvariantMass(histogramsInvariantMassMC,0);
 	createArrayOfHistogramsInvariantMass(histogramsInvariantMassDATA,1);
@@ -104,6 +107,7 @@ void FullAnalysis()
 	myTreeDATA->SetBranchAddress("Reco_QQ_sign", &Reco_QQ_sign_DATA, &b_Reco_QQ_sign_DATA);
 
 	// ----------  Loop through the MonteCarlo Events -------------
+	std::cout << "Looping through the MC \n";
 	Int_t numberOfEventsMC = myTreeMC->GetEntries();
 	//Generated events first
 	for (Int_t eventIterator = 0; eventIterator < numberOfEventsMC; eventIterator++)
@@ -125,6 +129,12 @@ void FullAnalysis()
 							histogramsRapidityMC[u]->Fill(dimu_GEN->Rapidity());
 							//histogramsAcoplanarity[u]->Fill(1 - (TMath::Abs(mupl_GEN->Phi() - mumi_GEN->Phi() )) / TMath::Pi() );
       			}
+
+						// Now apply the final cut on the Generated Data - For Acceptance
+						if(Cut(mumi_GEN, mupl_GEN, dimu_GEN, 0, Ntracks_MC, 6))
+						{
+							histogramsInvariantMassMC_GEN_CUTS->Fill(dimu_GEN->M());
+						}
       		}
       }
 
@@ -138,7 +148,7 @@ void FullAnalysis()
 
         for(Int_t u = 1; u < 7; u++)
           {
-      if(Cut(mumi_RECO, mupl_RECO, dimu_RECO, Reco_QQ_sign_MC,Ntracks_MC, u))
+      			if(Cut(mumi_RECO, mupl_RECO, dimu_RECO, Reco_QQ_sign_MC,Ntracks_MC, u))
             {
               //Fill histogramsInvariantMass invariantMass of dimuon
               histogramsInvariantMassMC[u]->Fill(dimu_RECO->M());
@@ -150,6 +160,7 @@ void FullAnalysis()
   }
 
 	// ----------  Loop through the Data Events -------------
+	std::cout << "Looping through the DATA \n";
   Int_t numberOfEventsDATA = myTreeDATA->GetEntries();
 
   //Reconstructed events only
@@ -178,10 +189,12 @@ void FullAnalysis()
       }
   }
 
+	// Set up the canvas - Hide the stat box
+	gStyle->SetOptStat(kFALSE);
 
- // ----------- Calculate Efficiency and Acceptance ---------------------
+ // -------------------- Calculate Efficiency and Acceptance -----------------------
 
- // ----------------------  Invariant Mass  -----------------------------
+ // ----------------------  Efficiency Invariant Mass  -----------------------------
 
   TH1D *invMassEffNum = (TH1D*) histogramsInvariantMassMC[6]->Clone("invMassEffNum");
   TH1D *invMassEffDen = (TH1D*) histogramsInvariantMassMC[0]->Clone("invMassEffDen");
@@ -189,9 +202,24 @@ void FullAnalysis()
   invMassEffNum->Sumw2();
   invMassEffNum->SetStats(0);
   invMassEffNum->Divide(invMassEffDen);
-
+	invMassEffNum->SetTitle("Efficiency - Invariant Mass (RECO / GEN)");
   TCanvas *efficiencyCanvas = new TCanvas("Efficiency", "Efficiency - RECO / GEN ", canvasXResolution,canvasYResolution);
   invMassEffNum->Draw("ep");
+	efficiencyCanvas->SaveAs("Efficiency - Invariant Mass.png");
+
+	// ----------------------  Acceptance Invariant Mass  -----------------------------
+
+
+	TH1D *invMassAccNum = (TH1D*) histogramsInvariantMassMC_GEN_CUTS->Clone("invMassAccNum");
+	TH1D *invMassAccDen = (TH1D*) histogramsInvariantMassMC[0]->Clone("invMassAccDen");
+
+	invMassAccNum->Sumw2();
+	invMassAccNum->SetStats(0);
+	invMassAccNum->Divide(invMassAccDen);
+	invMassAccNum->SetTitle("Acceptance - Invariant Mass (GEN_{cuts} / GEN)");
+	TCanvas *acceptanceCanvas = new TCanvas("Acceptance", "Acceptance - RECO / GEN ", canvasXResolution,canvasYResolution);
+	invMassAccNum->Draw("ep");
+	acceptanceCanvas->SaveAs("Acceptance - InvariantMass.png");
 
 
  // ------------ Save histograms to a new file --------------------------
@@ -200,7 +228,6 @@ void FullAnalysis()
 
  // --------------------- DRAW THE SUCKERS ------------------------------
 
-  gStyle->SetOptStat(kFALSE);
   Int_t palette[] = {kGreen, kRed, kBlue, kTeal, kYellow, kViolet, kMagenta};
 
   Double_t numberOfRecoEventsMC   = histogramsInvariantMassMC[6]->Integral();
