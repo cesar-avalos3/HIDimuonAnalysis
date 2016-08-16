@@ -56,7 +56,7 @@ void FullAnalysis()
 	TBranch         *b_Gen_QQ_4mom_DATA;   //!
 	TBranch         *b_Gen_QQ_mupl_4mom_DATA;   //!
 	TBranch         *b_Gen_QQ_mumi_4mom_DATA;   //!
-	Int_t		     Reco_QQ_sign_DATA;
+	Int_t						 Reco_QQ_sign_DATA;
 	Int_t            Reco_QQ_size_DATA;
 	TClonesArray    *Reco_QQ_4mom_DATA;
 	TClonesArray    *Reco_QQ_mupl_4mom_DATA;
@@ -178,7 +178,7 @@ void FullAnalysis()
 
         for(Int_t u = 0; u < 7; u++)
           {
-      if(Cut(mumi_RECO, mupl_RECO, dimu_RECO, Reco_QQ_sign_DATA,Ntracks_DATA, 1 + u))
+      			if(Cut(mumi_RECO, mupl_RECO, dimu_RECO, Reco_QQ_sign_DATA,Ntracks_DATA, 1 + u))
             {
               //Fill histogramsInvariantMass invariantMass of dimuon
               histogramsInvariantMassDATA[u]->Fill(dimu_RECO->M());
