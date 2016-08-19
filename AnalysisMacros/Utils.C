@@ -26,12 +26,14 @@ TString titleInvariantMassMC   = TString("MC - #mu^{+}#mu^{-} - InvariantMass - 
 TString titleInvariantMassDATA = TString("DATA - #mu^{+}#mu^{-} - InvariantMass - ");
 TString titleRapidityMC = TString("MC - #mu^{+}#mu^{-} - Rapidity - ");
 TString titleRapidityDATA = TString("DATA - #mu^{+}#mu^{-} - Rapidity - ");
-
+TString titleAcoDATA = TString("DATA - #mu^{+}#mu^{-} - Aco - ");
+TString titleAcoMC = TString("DATA - #mu^{+}#mu^{-} - Aco - ");
 Double_t TLegendSize[] = {0.611, 0.85, 0.984, 0.65};
 Int_t canvasXResolution = 800;
 Int_t canvasYResolution = 800;
 
 Double_t varBinMass[]     = {10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0,18.0, 19.0, 20.0,22.0,24.0,26.0,28.0,30.0,33.0,36.0,39.0,42.0,46.0,49.0,55.0,65.0,75.0,95.0,100.0};
+
 
 
 // Risky business
@@ -50,7 +52,7 @@ void createArrayOfHistogramsInvariantMass(TH1D** histArray, Int_t mode)
                 if(i == 0 && mode == 0) {tag = genTag; }
                 tag += i;
                 tag += invTag;
-                histArray[i] = new TH1D(tag, titleInvariantMass + cuts[i], 26,varBinMass);
+                histArray[i] = new TH1D(tag, titleInvariantMass + cuts[i], 30,10, 100);
                 histArray[i]->GetXaxis()->SetTitle("Invariant Mass - (GeV / C)");
                 histArray[i]->GetYaxis()->SetTitle("Counts");
         }
@@ -72,6 +74,24 @@ void createArrayOfHistogramsRapidity(TH1D** histArray, Int_t mode)
                 tag += rapTag;
 
                 histArray[i] = new TH1D(tag, titleRapidity + cuts[i], 25, -2.5, 2.5);
+        }
+}
+
+void createArrayOfHistogramsAcoplanarity(TH1D** histArray, Int_t mode)
+{
+        TString modeString = MCtag;
+        TString titleAco = "Acoplanarity - ";
+        if(mode == 1) {modeString = DATAtag; titleAco = titleAcoDATA; }
+
+        for(Int_t i = 0; i < 7; i++)
+        {
+                TString tag = modeString;
+                tag += recTag;
+                if(i == 0 && mode == 0) {tag = genTag; }
+                tag += i;
+                tag += acoTag;
+
+                histArray[i] = new TH1D(tag, titleAco + cuts[i], 26, varBinMass);
         }
 }
 
@@ -128,7 +148,7 @@ bool Cut(TLorentzVector* mumi, TLorentzVector* mupl, TLorentzVector* dimu,Int_t 
                 break;
         case (6):
                 if(mumi->Pt() > 4 && mupl->Pt() > 4 && TMath::Abs(mumi->PseudoRapidity()) < 2.4 && TMath::Abs(mupl->PseudoRapidity()) < 2.4 && Reco_QQ_sign == 0 && dimu->M() > 10
-                   && (1 - (TMath::Abs(mumi->Phi() - mupl->Phi()) / TMath::Pi()) ) < 0.008 && Ntracks == 2)
+                   && Ntracks == 2)
                         return true;
                 break;
         }
