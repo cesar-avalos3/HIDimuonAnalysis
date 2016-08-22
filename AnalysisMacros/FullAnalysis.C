@@ -283,15 +283,15 @@ void FullAnalysis() {
   // We are going to normalize the histograms by the number of generated events
   TH1D *invMassGeneratedMC = (TH1D *)histogramsInvariantMassMC[0]->Clone("invMassGeneratedMC");
   invMassCorrecDataNum->Divide(invMassCorrecDataNum2);
-  invMassCorrecDataNum->SetTitle("Invariant Mass - AE * N_{DATA}");
+  invMassGeneratedMC->SetTitle("Invariant Mass - Corrected Data vs MC");
   invMassCorrecDataNum->SetMarkerStyle(20);
-  invMassGeneratedMC->Scale(1 / numberOfGeneEventsMC);
+  Int_t numberOfCorrectedDataIntegral = invMassCorrecDataNum->Integral();
+  Int_t numberOfCorrectedDataEvents = invMassCorrecDataNum->GetEntries();
+  //invMassGeneratedMC->Scale(numberOfCorrectedDataEvents / numberOfCorrectedDataIntegral);
+  TH1D *invMassCorrectedData = histogramsDeltaBinByBin(invMassCorrecDataNum, varBinMass, 26);
+  invMassGeneratedMC->Scale(invMassCorrectedData->GetEntries() / invMassCorrectedData->Integral());
   invMassGeneratedMC->Draw("");
-  invMassCorrecDataNum->Scale(1 / numberOfGeneEventsMC);
-  invMassCorrecDataNum->Draw("ep&&SAME");
-  TH1D *test = histogramsDeltaBinByBin(invMassCorrecDataNum, varBinMass, 26);
-  test->Draw("");
-  test->Write();
+  invMassCorrectedData->Draw("ep&&SAME");
 
   // --------------------- DRAW THE SUCKERS ------------------------------
 

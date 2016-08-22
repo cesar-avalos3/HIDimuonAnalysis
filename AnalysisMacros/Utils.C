@@ -264,7 +264,7 @@ TH1D *histogramsDeltaBinByBin(TH1D *histogramDelta, Double_t binArray[], Int_t b
   TH1D *temp = new TH1D(newName, histogramDelta->GetTitle(), binNumber, binArray);
 
   for (Int_t i = 0; i < binNumber; i++) {
-    temp->Fill(histogramDelta->GetBinContent(i) / binArray[i]);
+    temp->SetBinContent(i, histogramDelta->GetBinContent(i) / binArray[i]);
   }
 
   return temp;
